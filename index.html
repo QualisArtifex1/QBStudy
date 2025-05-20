@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Quiz Bowl Study Aid</title>
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --royal-blue: #4169e1;
+      --light-blue: #f5faff;
+      --white: #ffffff;
+      --gray-light: #f0f0f0;
+      --font-main: 'Poppins', sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      background: var(--gray-light);
+      color: var(--royal-blue);
+    }
+    .container {
+      max-width: 960px;
+      margin: 20px auto;
+      padding: 20px;
+      background: var(--white);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      border-radius: 8px;
+    }
+    header { text-align: center; margin-bottom: 24px; }
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      font-weight: 600;
+    }
+    .form-group { margin-bottom: 16px; }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    input, textarea, button {
+      font-family: var(--font-main);
+    }
+    /* Unified input styling without bottom margin */
+    input, textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--royal-blue);
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    /* Restore bottom margin only in form groups */
+    .form-group input,
+    .form-group textarea {
+      margin-bottom: 8px;
+    }
+    /* Remove extra margin for table cells */
+    #practice-table input {
+      margin: 0;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .toolbar button {
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+    .toolbar button:hover {
+      background: var(--light-blue);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+    }
+    th, td {
+      border: 1px solid var(--royal-blue);
+      padding: 8px;
+    }
+    th {
+      background: var(--royal-blue);
+      color: var(--white);
+      font-weight: 600;
+    }
+    tbody tr:nth-child(odd) {
+      background: var(--light-blue);
+    }
+
+    /* Flashcard view */
+    #flashcard-view {
+      display: none;
+      padding: 20px;
+      text-align: center;
+    }
+    .card-container {
+      perspective: 1000px;
+      margin-bottom: 16px;
+    }
+    .card {
+      width: 320px;
+      height: 200px;
+      margin: 0 auto;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      cursor: pointer;
+    }
+    .card.flipped { transform: rotateY(180deg); }
+    .card-side {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid var(--royal-blue);
+      border-radius: 12px;
+      background: var(--white);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      padding: 12px;
+      box-sizing: border-box;
+      font-size: 1.2rem;
+      font-weight: 500;
+      text-align: center;
+    }
+    .back {
+      transform: rotateY(180deg);
+      background: var(--royal-blue);
+      color: var(--white);
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 12px;
+    }
+    .nav-buttons button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Notification */
+    .notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--royal-blue);
+      color: var(--white);
+      padding: 10px 14px;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- MAIN VIEW -->
+    <div id="main-view">
+      <header><h1>Quiz Bowl Study Aid</h1></header>
+
+      <div class="form-group">
+        <label for="student-name">Student Name:</label>
+        <input type="text" id="student-name" placeholder="Your name…">
+      </div>
+
+      <div class="form-group">
+        <label for="date-input">Date:</label>
+        <input type="date" id="date-input">
+      </div>
+
+      <table id="practice-table">
+        <thead>
+          <tr>
+            <th>Answer Line</th>
+            <th colspan="5">Clues (up to 5)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- JS populates rows -->
+        </tbody>
+      </table>
+
+      <div class="toolbar">
+        <button id="add-row-btn">Add Answer Line</button>
+        <button id="study-btn">Study</button>
+        <button id="copy-btn">Copy Clues</button>
+        <button id="import-btn">Import Clues</button>
+        <button id="study-imported-btn" style="display:none;">Study Imported Clues</button>
+      </div>
+
+      <textarea id="import-area" placeholder="Paste clues here (one per line)…"
+                style="display:none; height:100px;"></textarea>
+    </div>
+
+    <!-- FLASHCARD VIEW -->
+    <div id="flashcard-view">
+      <div class="card-container">
+        <div class="card" id="flashcard">
+          <div class="card-side front" id="card-front"></div>
+          <div class="card-side back" id="card-back"></div>
+        </div>
+      </div>
+      <div id="card-info"></div>
+      <div class="nav-buttons">
+        <button id="prev-btn">Previous</button>
+        <button id="home-btn">Home</button>
+        <button id="next-btn">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  (function(){
+    const DEFAULT_ROWS = 20;
+    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random()* (i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }}
+    function copyToClipboard(text) { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='absolute'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
+    function showNotification(msg) { const n=document.createElement('div'); n.className='notification'; n.textContent=msg; document.body.appendChild(n); requestAnimationFrame(()=>n.style.opacity='1'); setTimeout(()=>{ n.style.opacity='0'; n.addEventListener('transitionend',()=>document.body.removeChild(n)); },2000); }
+    function createRow(){ const tr=document.createElement('tr'); const tdAns=document.createElement('td'); const ansInput=document.createElement('input'); ansInput.type='text'; ansInput.className='answer-line'; ansInput.placeholder='Answer line'; tdAns.appendChild(ansInput); tr.appendChild(tdAns); for(let j=0;j<5;j++){ const tdClue=document.createElement('td'); const clueInput=document.createElement('input'); clueInput.type='text'; clueInput.className='clue'; clueInput.placeholder=`Clue ${j+1}`; tdClue.appendChild(clueInput); tr.appendChild(tdClue);} return tr; }
+    const tbody=document.querySelector('#practice-table tbody'); for(let i=0;i<DEFAULT_ROWS;i++){ tbody.appendChild(createRow()); }
+    const addRowBtn=document.getElementById('add-row-btn'); const mainView=document.getElementById('main-view'); const flashView=document.getElementById('flashcard-view'); const studyBtn=document.getElementById('study-btn'); const studyImportedBtn=document.getElementById('study-imported-btn'); const copyBtn=document.getElementById('copy-btn'); const importBtn=document.getElementById('import-btn'); const importArea=document.getElementById('import-area'); const dateInput=document.getElementById('date-input'); const flashcard=document.getElementById('flashcard'); const frontDiv=document.getElementById('card-front'); const backDiv=document.getElementById('card-back'); const infoDiv=document.getElementById('card-info'); const nextBtn=document.getElementById('next-btn'); const prevBtn=document.getElementById('prev-btn'); const homeBtn=document.getElementById('home-btn'); dateInput.valueAsDate=new Date(); let cards=[],idx=0;
+    addRowBtn.addEventListener('click',()=>{ tbody.appendChild(createRow()); });
+    function collectData(fromImport=false){ const entries=[]; if(fromImport){ importArea.value.trim().split('\n').forEach(line=>{ const [ans,cluesPart]=line.split(';'); if(!ans) return; const clues=(cluesPart||'').split(',').map(c=>c.trim()).filter(c=>c); if(!clues.length) return; entries.push({answer:ans.trim(),clues}); }); } else { document.querySelectorAll('#practice-table tbody tr').forEach(row=>{ const ans=row.querySelector('.answer-line').value.trim(); if(!ans) return; const clues=Array.from(row.querySelectorAll('.clue')).map(i=>i.value.trim()).filter(v=>v); if(!clues.length) return; entries.push({answer:ans,clues}); }); } return entries.flatMap(e=>e.clues.map(clue=>({answer:e.answer,clue}))); }
+    function showFlashcards(){ shuffleArray(cards); mainView.style.display='none'; flashView.style.display='block'; idx=0; updateCard(); }
+    studyBtn.addEventListener('click',()=>{ importArea.style.display='none'; studyImportedBtn.style.display='none'; cards=collectData(false); if(!cards.length){ showNotification('Enter an answer with a clue.'); return;} showFlashcards(); });
+    studyImportedBtn.addEventListener('click',()=>{ cards=collectData(true); if(!cards.length){ showNotification('No valid imported clues.'); return;} showFlashcards(); });
+    copyBtn.addEventListener('click',()=>{ const lines=[]; document.querySelectorAll('#practice-table tbody tr').forEach(row=>{ const ans=row.querySelector('.answer-line').value.trim(); if(!ans) return; const clues=Array.from(row.querySelectorAll('.clue')).map(i=>i.value.trim()).filter(v=>v); if(!clues.length) return; lines.push(`${ans}; ${clues.join(', ')}`); }); if(!lines.length){ showNotification('No clues to copy.'); return;} copyToClipboard(lines.join('\n')); showNotification('Clues copied!'); });
+    importBtn.addEventListener('click',()=>{ const showing=importArea.style.display==='block'; importArea.style.display=showing?'none':'block'; studyImportedBtn.style.display=showing?'none':'inline-block'; });
+    function updateCard(){ const {answer,clue}=cards[idx]; frontDiv.textContent=clue; backDiv.textContent=answer; infoDiv.textContent=`${idx+1} / ${cards.length}`; flashcard.classList.remove('flipped'); }
+    flashcard.addEventListener('click',()=>flashcard.classList.toggle('flipped'));
+    nextBtn.addEventListener('click',()=>{ if(idx<cards.length-1){idx++; updateCard();}});
+    prevBtn.addEventListener('click',()=>{ if(idx>0){idx--; updateCard();}});
+    homeBtn.addEventListener('click',()=>{ flashView.style.display='none'; mainView.style.display='block'; importArea.style.display='none'; studyImportedBtn.style.display='none'; });
+  })();
+  </script>
+</body>
+</html>
