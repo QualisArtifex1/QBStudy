@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <title>Quiz Bowl Study Aid</title>
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     :root {
       --royal-blue: #4169e1;
@@ -13,51 +12,108 @@
       --white: #ffffff;
       --gray-light: #f0f0f0;
       --font-main: 'Poppins', sans-serif;
+
+      /* Theme tokens (default = light) */
+      --bg: var(--gray-light);
+      --surface: var(--white);
+      --text: var(--royal-blue);
+      --muted: rgba(0, 0, 0, 0.6);
+      --border: var(--royal-blue);
+      --table-odd: var(--light-blue);
+      --th-bg: var(--royal-blue);
+      --th-text: var(--white);
+      --card-front-bg: var(--white);
+      --card-front-text: var(--royal-blue);
+      --card-back-bg: var(--royal-blue);
+      --card-back-text: var(--white);
+      --shadow: rgba(0, 0, 0, 0.05);
+      --shadow-strong: rgba(0, 0, 0, 0.1);
     }
+
+    /* Dark mode overrides */
+    [data-theme="dark"] {
+      --bg: #0b1020;
+      --surface: #111a33;
+      --text: #e8edff;
+      --muted: rgba(232, 237, 255, 0.7);
+      --border: rgba(232, 237, 255, 0.35);
+      --table-odd: rgba(65, 105, 225, 0.12);
+      --th-bg: rgba(65, 105, 225, 0.55);
+      --th-text: #ffffff;
+      --card-front-bg: #0f1730;
+      --card-front-text: #e8edff;
+      --card-back-bg: rgba(65, 105, 225, 0.75);
+      --card-back-text: #ffffff;
+      --shadow: rgba(0, 0, 0, 0.35);
+      --shadow-strong: rgba(0, 0, 0, 0.45);
+    }
+
     body {
       margin: 0;
       padding: 0;
       font-family: var(--font-main);
-      background: var(--gray-light);
-      color: var(--royal-blue);
+      background: var(--bg);
+      color: var(--text);
     }
+
     .container {
       max-width: 960px;
       margin: 20px auto;
       padding: 20px;
-      background: var(--white);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      background: var(--surface);
+      box-shadow: 0 4px 12px var(--shadow);
       border-radius: 8px;
     }
-    header { text-align: center; margin-bottom: 24px; }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
     h1 {
       margin: 0;
       font-size: 2rem;
       font-weight: 600;
     }
-    .form-group { margin-bottom: 16px; }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
     label {
       display: block;
       margin-bottom: 6px;
       font-weight: 600;
+      color: var(--text);
     }
-    input, textarea, button {
+
+    input,
+    textarea,
+    button {
       font-family: var(--font-main);
     }
-    /* Unified input styling without bottom margin */
-    input, textarea {
+
+    input,
+    textarea {
       width: 100%;
       padding: 8px;
-      border: 1px solid var(--royal-blue);
+      border: 1px solid var(--border);
       border-radius: 4px;
       box-sizing: border-box;
+      background: transparent;
+      color: var(--text);
     }
-    /* Restore bottom margin only in form groups */
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
     .form-group input,
     .form-group textarea {
       margin-bottom: 8px;
     }
-    /* Remove extra margin for table cells */
+
     #practice-table input {
       margin: 0;
     }
@@ -67,15 +123,25 @@
       flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 16px;
+      justify-content: center;
     }
+
     .toolbar button {
       padding: 8px 12px;
       font-size: 0.95rem;
       border-radius: 4px;
-      transition: background 0.2s;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      transition: background 0.2s, transform 0.05s;
     }
+
     .toolbar button:hover {
-      background: var(--light-blue);
+      background: var(--table-odd);
+    }
+
+    .toolbar button:active {
+      transform: translateY(1px);
     }
 
     table {
@@ -83,17 +149,21 @@
       border-collapse: collapse;
       margin-bottom: 24px;
     }
-    th, td {
-      border: 1px solid var(--royal-blue);
+
+    th,
+    td {
+      border: 1px solid var(--border);
       padding: 8px;
     }
+
     th {
-      background: var(--royal-blue);
-      color: var(--white);
+      background: var(--th-bg);
+      color: var(--th-text);
       font-weight: 600;
     }
+
     tbody tr:nth-child(odd) {
-      background: var(--light-blue);
+      background: var(--table-odd);
     }
 
     /* Flashcard view */
@@ -102,10 +172,12 @@
       padding: 20px;
       text-align: center;
     }
+
     .card-container {
       perspective: 1000px;
       margin-bottom: 16px;
     }
+
     .card {
       width: 320px;
       height: 200px;
@@ -115,7 +187,16 @@
       transition: transform 0.6s;
       cursor: pointer;
     }
-    .card.flipped { transform: rotateY(180deg); }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* Used to prevent “spoiler flash” when moving to next card */
+    .card.no-transition {
+      transition: none !important;
+    }
+
     .card-side {
       position: absolute;
       width: 100%;
@@ -124,31 +205,54 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 2px solid var(--royal-blue);
+      border: 2px solid var(--border);
       border-radius: 12px;
-      background: var(--white);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      background: var(--card-front-bg);
+      color: var(--card-front-text);
+      box-shadow: 0 6px 18px var(--shadow-strong);
       padding: 12px;
       box-sizing: border-box;
       font-size: 1.2rem;
       font-weight: 500;
       text-align: center;
     }
+
     .back {
       transform: rotateY(180deg);
-      background: var(--royal-blue);
-      color: var(--white);
+      background: var(--card-back-bg);
+      color: var(--card-back-text);
+      border-color: var(--border);
     }
+
     .nav-buttons {
       display: flex;
       justify-content: center;
       gap: 16px;
       margin-top: 12px;
     }
+
     .nav-buttons button {
       padding: 8px 16px;
       border-radius: 4px;
       font-weight: 600;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      transition: background 0.2s, transform 0.05s;
+    }
+
+    .nav-buttons button:hover {
+      background: var(--table-odd);
+    }
+
+    .nav-buttons button:active {
+      transform: translateY(1px);
+    }
+
+    #card-info {
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.95rem;
     }
 
     /* Notification */
@@ -160,10 +264,20 @@
       color: var(--white);
       padding: 10px 14px;
       border-radius: 6px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
       opacity: 0;
       transition: opacity 0.3s;
       z-index: 1000;
+    }
+
+    /* Accessibility: respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        transition: none;
+      }
+      .notification {
+        transition: none;
+      }
     }
   </style>
 </head>
@@ -175,12 +289,12 @@
 
       <div class="form-group">
         <label for="student-name">Student Name:</label>
-        <input type="text" id="student-name" placeholder="Your name…">
+        <input type="text" id="student-name" placeholder="Your name…" />
       </div>
 
       <div class="form-group">
         <label for="date-input">Date:</label>
-        <input type="date" id="date-input">
+        <input type="date" id="date-input" />
       </div>
 
       <table id="practice-table">
@@ -201,10 +315,15 @@
         <button id="copy-btn">Copy Clues</button>
         <button id="import-btn">Import Clues</button>
         <button id="study-imported-btn" style="display:none;">Study Imported Clues</button>
+        <button id="clear-all-btn" title="Clear all rows" aria-label="Clear all rows">Clear All</button>
+        <button id="theme-toggle-btn" title="Toggle dark mode" aria-label="Toggle dark mode">Dark Mode</button>
       </div>
 
-      <textarea id="import-area" placeholder="Paste clues here (one per line)…"
-                style="display:none; height:100px;"></textarea>
+      <textarea
+        id="import-area"
+        placeholder="Paste clues here (one per line)…"
+        style="display:none; height:100px;"
+      ></textarea>
     </div>
 
     <!-- FLASHCARD VIEW -->
@@ -225,27 +344,403 @@
   </div>
 
   <script>
-  (function(){
-    const DEFAULT_ROWS = 20;
-    function shuffleArray(arr) { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random()* (i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }}
-    function copyToClipboard(text) { const ta=document.createElement('textarea'); ta.value=text; ta.style.position='absolute'; ta.style.left='-9999px'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }
-    function showNotification(msg) { const n=document.createElement('div'); n.className='notification'; n.textContent=msg; document.body.appendChild(n); requestAnimationFrame(()=>n.style.opacity='1'); setTimeout(()=>{ n.style.opacity='0'; n.addEventListener('transitionend',()=>document.body.removeChild(n)); },2000); }
-    function createRow(){ const tr=document.createElement('tr'); const tdAns=document.createElement('td'); const ansInput=document.createElement('input'); ansInput.type='text'; ansInput.className='answer-line'; ansInput.placeholder='Answer line'; tdAns.appendChild(ansInput); tr.appendChild(tdAns); for(let j=0;j<5;j++){ const tdClue=document.createElement('td'); const clueInput=document.createElement('input'); clueInput.type='text'; clueInput.className='clue'; clueInput.placeholder=`Clue ${j+1}`; tdClue.appendChild(clueInput); tr.appendChild(tdClue);} return tr; }
-    const tbody=document.querySelector('#practice-table tbody'); for(let i=0;i<DEFAULT_ROWS;i++){ tbody.appendChild(createRow()); }
-    const addRowBtn=document.getElementById('add-row-btn'); const mainView=document.getElementById('main-view'); const flashView=document.getElementById('flashcard-view'); const studyBtn=document.getElementById('study-btn'); const studyImportedBtn=document.getElementById('study-imported-btn'); const copyBtn=document.getElementById('copy-btn'); const importBtn=document.getElementById('import-btn'); const importArea=document.getElementById('import-area'); const dateInput=document.getElementById('date-input'); const flashcard=document.getElementById('flashcard'); const frontDiv=document.getElementById('card-front'); const backDiv=document.getElementById('card-back'); const infoDiv=document.getElementById('card-info'); const nextBtn=document.getElementById('next-btn'); const prevBtn=document.getElementById('prev-btn'); const homeBtn=document.getElementById('home-btn'); dateInput.valueAsDate=new Date(); let cards=[],idx=0;
-    addRowBtn.addEventListener('click',()=>{ tbody.appendChild(createRow()); });
-    function collectData(fromImport=false){ const entries=[]; if(fromImport){ importArea.value.trim().split('\n').forEach(line=>{ const [ans,cluesPart]=line.split(';'); if(!ans) return; const clues=(cluesPart||'').split(',').map(c=>c.trim()).filter(c=>c); if(!clues.length) return; entries.push({answer:ans.trim(),clues}); }); } else { document.querySelectorAll('#practice-table tbody tr').forEach(row=>{ const ans=row.querySelector('.answer-line').value.trim(); if(!ans) return; const clues=Array.from(row.querySelectorAll('.clue')).map(i=>i.value.trim()).filter(v=>v); if(!clues.length) return; entries.push({answer:ans,clues}); }); } return entries.flatMap(e=>e.clues.map(clue=>({answer:e.answer,clue}))); }
-    function showFlashcards(){ shuffleArray(cards); mainView.style.display='none'; flashView.style.display='block'; idx=0; updateCard(); }
-    studyBtn.addEventListener('click',()=>{ importArea.style.display='none'; studyImportedBtn.style.display='none'; cards=collectData(false); if(!cards.length){ showNotification('Enter an answer with a clue.'); return;} showFlashcards(); });
-    studyImportedBtn.addEventListener('click',()=>{ cards=collectData(true); if(!cards.length){ showNotification('No valid imported clues.'); return;} showFlashcards(); });
-    copyBtn.addEventListener('click',()=>{ const lines=[]; document.querySelectorAll('#practice-table tbody tr').forEach(row=>{ const ans=row.querySelector('.answer-line').value.trim(); if(!ans) return; const clues=Array.from(row.querySelectorAll('.clue')).map(i=>i.value.trim()).filter(v=>v); if(!clues.length) return; lines.push(`${ans}; ${clues.join(', ')}`); }); if(!lines.length){ showNotification('No clues to copy.'); return;} copyToClipboard(lines.join('\n')); showNotification('Clues copied!'); });
-    importBtn.addEventListener('click',()=>{ const showing=importArea.style.display==='block'; importArea.style.display=showing?'none':'block'; studyImportedBtn.style.display=showing?'none':'inline-block'; });
-    function updateCard(){ const {answer,clue}=cards[idx]; frontDiv.textContent=clue; backDiv.textContent=answer; infoDiv.textContent=`${idx+1} / ${cards.length}`; flashcard.classList.remove('flipped'); }
-    flashcard.addEventListener('click',()=>flashcard.classList.toggle('flipped'));
-    nextBtn.addEventListener('click',()=>{ if(idx<cards.length-1){idx++; updateCard();}});
-    prevBtn.addEventListener('click',()=>{ if(idx>0){idx--; updateCard();}});
-    homeBtn.addEventListener('click',()=>{ flashView.style.display='none'; mainView.style.display='block'; importArea.style.display='none'; studyImportedBtn.style.display='none'; });
-  })();
+    (function () {
+      const DEFAULT_ROWS = 20;
+
+      // --- Autosave table (answer lines + clues) ---
+      const TABLE_KEY = 'qbStudyTable';
+
+      function debounce(fn, wait) {
+        let t;
+        return function (...args) {
+          clearTimeout(t);
+          t = setTimeout(() => fn.apply(this, args), wait);
+        };
+      }
+
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+      }
+
+      function copyToClipboard(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'absolute';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+      }
+
+      function showNotification(msg) {
+        const n = document.createElement('div');
+        n.className = 'notification';
+        n.textContent = msg;
+        document.body.appendChild(n);
+        requestAnimationFrame(() => (n.style.opacity = '1'));
+        setTimeout(() => {
+          n.style.opacity = '0';
+          n.addEventListener('transitionend', () => document.body.removeChild(n));
+        }, 2000);
+      }
+
+      function createRow() {
+        const tr = document.createElement('tr');
+
+        const tdAns = document.createElement('td');
+        const ansInput = document.createElement('input');
+        ansInput.type = 'text';
+        ansInput.className = 'answer-line';
+        ansInput.placeholder = 'Answer line';
+        tdAns.appendChild(ansInput);
+        tr.appendChild(tdAns);
+
+        for (let j = 0; j < 5; j++) {
+          const tdClue = document.createElement('td');
+          const clueInput = document.createElement('input');
+          clueInput.type = 'text';
+          clueInput.className = 'clue';
+          clueInput.placeholder = `Clue ${j + 1}`;
+          tdClue.appendChild(clueInput);
+          tr.appendChild(tdClue);
+        }
+
+        return tr;
+      }
+
+      function serializeTable() {
+        const rows = [];
+        document.querySelectorAll('#practice-table tbody tr').forEach((row) => {
+          const answer = row.querySelector('.answer-line')?.value ?? '';
+          const clues = Array.from(row.querySelectorAll('.clue')).map((i) => i.value ?? '');
+          rows.push({ answer, clues });
+        });
+        return { rows };
+      }
+
+      function saveTable() {
+        try {
+          localStorage.setItem(TABLE_KEY, JSON.stringify(serializeTable()));
+        } catch (e) {
+          // If storage is full/blocked, we silently fail—app still works.
+        }
+      }
+
+      function loadTable() {
+        try {
+          const raw = localStorage.getItem(TABLE_KEY);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          if (!parsed || !Array.isArray(parsed.rows)) return null;
+          return parsed;
+        } catch (e) {
+          return null;
+        }
+      }
+
+      const saveTableDebounced = debounce(saveTable, 250);
+
+      // Populate rows: prefer saved state, else DEFAULT_ROWS
+      const tbody = document.querySelector('#practice-table tbody');
+      const saved = loadTable();
+      const rowCount = saved?.rows?.length ? Math.max(DEFAULT_ROWS, saved.rows.length) : DEFAULT_ROWS;
+      for (let i = 0; i < rowCount; i++) {
+        tbody.appendChild(createRow());
+      }
+
+      // Restore saved values (if present)
+      if (saved?.rows?.length) {
+        const trs = Array.from(document.querySelectorAll('#practice-table tbody tr'));
+        saved.rows.forEach((r, i) => {
+          const tr = trs[i];
+          if (!tr) return;
+          const ansEl = tr.querySelector('.answer-line');
+          if (ansEl) ansEl.value = r.answer ?? '';
+          const clueEls = Array.from(tr.querySelectorAll('.clue'));
+          (r.clues ?? []).forEach((c, j) => {
+            if (clueEls[j]) clueEls[j].value = c ?? '';
+          });
+        });
+      }
+
+      // Event delegation: save on any input change in the table
+      tbody.addEventListener('input', saveTableDebounced);
+      window.addEventListener('beforeunload', saveTable);
+
+      // Elements
+      const addRowBtn = document.getElementById('add-row-btn');
+      const mainView = document.getElementById('main-view');
+      const flashView = document.getElementById('flashcard-view');
+      const studyBtn = document.getElementById('study-btn');
+      const studyImportedBtn = document.getElementById('study-imported-btn');
+      const copyBtn = document.getElementById('copy-btn');
+      const importBtn = document.getElementById('import-btn');
+      const importArea = document.getElementById('import-area');
+      const dateInput = document.getElementById('date-input');
+      const flashcard = document.getElementById('flashcard');
+      const frontDiv = document.getElementById('card-front');
+      const backDiv = document.getElementById('card-back');
+      const infoDiv = document.getElementById('card-info');
+      const nextBtn = document.getElementById('next-btn');
+      const prevBtn = document.getElementById('prev-btn');
+      const homeBtn = document.getElementById('home-btn');
+      const themeToggleBtn = document.getElementById('theme-toggle-btn');
+      const clearAllBtn = document.getElementById('clear-all-btn');
+
+      // --- Self-tests (helps catch missing IDs early) ---
+      function runSelfTests() {
+        const required = {
+          addRowBtn,
+          mainView,
+          flashView,
+          studyBtn,
+          studyImportedBtn,
+          copyBtn,
+          importBtn,
+          importArea,
+          dateInput,
+          flashcard,
+          frontDiv,
+          backDiv,
+          infoDiv,
+          nextBtn,
+          prevBtn,
+          homeBtn,
+          themeToggleBtn,
+          clearAllBtn,
+          tbody,
+        };
+        const missing = Object.entries(required)
+          .filter(([, el]) => !el)
+          .map(([name]) => name);
+
+        if (missing.length) {
+          console.error('QB Study Aid: missing required elements:', missing);
+          // Show a user-friendly hint, but keep the app from crashing.
+          showNotification('Page setup error: missing elements. Check console.');
+          return false;
+        }
+        return true;
+      }
+
+      if (!runSelfTests()) return;
+
+      // Default date
+      dateInput.valueAsDate = new Date();
+
+      let cards = [];
+      let idx = 0;
+
+      // --- Dark mode (manual + saved) ---
+      const THEME_KEY = 'qbStudyTheme';
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+          themeToggleBtn.textContent = 'Light Mode';
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+          themeToggleBtn.textContent = 'Dark Mode';
+        }
+      }
+
+      function getPreferredTheme() {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme === 'light' || savedTheme === 'dark') return savedTheme;
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const next = current === 'dark' ? 'light' : 'dark';
+        localStorage.setItem(THEME_KEY, next);
+        applyTheme(next);
+      }
+
+      applyTheme(getPreferredTheme());
+      themeToggleBtn.addEventListener('click', toggleTheme);
+
+      // If user hasn't set a preference, follow OS changes
+      if (!localStorage.getItem(THEME_KEY) && window.matchMedia) {
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        mq.addEventListener?.('change', () => applyTheme(getPreferredTheme()));
+      }
+
+      // --- App logic ---
+      addRowBtn.addEventListener('click', () => {
+        tbody.appendChild(createRow());
+        saveTable();
+      });
+
+      // Clear all rows (with confirmation)
+      clearAllBtn.addEventListener('click', () => {
+        const ok = window.confirm('Clear everything? This will erase all answer lines and clues on this page.');
+        if (!ok) return;
+
+        try {
+          localStorage.removeItem(TABLE_KEY);
+        } catch (e) {
+          // ignore
+        }
+
+        tbody.innerHTML = '';
+        for (let i = 0; i < DEFAULT_ROWS; i++) {
+          tbody.appendChild(createRow());
+        }
+
+        saveTable();
+        showNotification('Cleared!');
+      });
+
+      function collectData(fromImport = false) {
+        const entries = [];
+
+        if (fromImport) {
+          importArea.value
+            .trim()
+            .split('\n')
+            .forEach((line) => {
+              const [ans, cluesPart] = line.split(';');
+              if (!ans) return;
+              const clues = (cluesPart || '')
+                .split(',')
+                .map((c) => c.trim())
+                .filter((c) => c);
+              if (!clues.length) return;
+              entries.push({ answer: ans.trim(), clues });
+            });
+        } else {
+          document.querySelectorAll('#practice-table tbody tr').forEach((row) => {
+            const ans = row.querySelector('.answer-line').value.trim();
+            if (!ans) return;
+            const clues = Array.from(row.querySelectorAll('.clue'))
+              .map((i) => i.value.trim())
+              .filter((v) => v);
+            if (!clues.length) return;
+            entries.push({ answer: ans, clues });
+          });
+        }
+
+        return entries.flatMap((e) => e.clues.map((clue) => ({ answer: e.answer, clue })));
+      }
+
+      function showFlashcards() {
+        shuffleArray(cards);
+        mainView.style.display = 'none';
+        flashView.style.display = 'block';
+        idx = 0;
+        updateCard(true);
+      }
+
+      studyBtn.addEventListener('click', () => {
+        importArea.style.display = 'none';
+        studyImportedBtn.style.display = 'none';
+        cards = collectData(false);
+        if (!cards.length) {
+          showNotification('Enter an answer with a clue.');
+          return;
+        }
+        showFlashcards();
+      });
+
+      studyImportedBtn.addEventListener('click', () => {
+        cards = collectData(true);
+        if (!cards.length) {
+          showNotification('No valid imported clues.');
+          return;
+        }
+        showFlashcards();
+      });
+
+      copyBtn.addEventListener('click', () => {
+        const lines = [];
+        document.querySelectorAll('#practice-table tbody tr').forEach((row) => {
+          const ans = row.querySelector('.answer-line').value.trim();
+          if (!ans) return;
+          const clues = Array.from(row.querySelectorAll('.clue'))
+            .map((i) => i.value.trim())
+            .filter((v) => v);
+          if (!clues.length) return;
+          lines.push(`${ans}; ${clues.join(', ')}`);
+        });
+        if (!lines.length) {
+          showNotification('No clues to copy.');
+          return;
+        }
+        copyToClipboard(lines.join('\n'));
+        showNotification('Clues copied!');
+      });
+
+      importBtn.addEventListener('click', () => {
+        const showing = importArea.style.display === 'block';
+        importArea.style.display = showing ? 'none' : 'block';
+        studyImportedBtn.style.display = showing ? 'none' : 'inline-block';
+      });
+
+      // --- Spoiler-proof card update ---
+      function snapCardToFrontNoSpoiler() {
+        flashcard.classList.add('no-transition');
+        flashcard.classList.remove('flipped');
+        // Force a reflow so the browser applies the no-transition + unflipped state immediately.
+        // eslint-disable-next-line no-unused-expressions
+        flashcard.offsetHeight;
+      }
+
+      function restoreCardTransition() {
+        // Another reflow makes the transition restoration reliable across browsers.
+        // eslint-disable-next-line no-unused-expressions
+        flashcard.offsetHeight;
+        flashcard.classList.remove('no-transition');
+      }
+
+      function updateCard(isFirst = false) {
+        if (!cards.length) return;
+
+        snapCardToFrontNoSpoiler();
+
+        const { answer, clue } = cards[idx];
+        frontDiv.textContent = clue;
+        backDiv.textContent = answer;
+        infoDiv.textContent = `${idx + 1} / ${cards.length}`;
+
+        requestAnimationFrame(() => {
+          restoreCardTransition();
+          if (isFirst) flashcard.classList.remove('flipped');
+        });
+      }
+
+      flashcard.addEventListener('click', () => {
+        flashcard.classList.toggle('flipped');
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (idx < cards.length - 1) {
+          idx++;
+          updateCard();
+        }
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (idx > 0) {
+          idx--;
+          updateCard();
+        }
+      });
+
+      homeBtn.addEventListener('click', () => {
+        flashView.style.display = 'none';
+        mainView.style.display = 'block';
+        importArea.style.display = 'none';
+        studyImportedBtn.style.display = 'none';
+
+        snapCardToFrontNoSpoiler();
+        restoreCardTransition();
+      });
+    })();
   </script>
 </body>
 </html>
