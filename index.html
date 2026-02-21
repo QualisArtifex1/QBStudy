@@ -255,6 +255,31 @@
       font-size: 0.95rem;
     }
 
+    .practice-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .practice-buttons button {
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      transition: background 0.2s, transform 0.05s;
+    }
+
+    .practice-buttons button:hover {
+      background: var(--table-odd);
+    }
+
+    .practice-buttons button:active {
+      transform: translateY(1px);
+    }
+
     /* Notification */
     .notification {
       position: fixed;
@@ -335,6 +360,10 @@
         </div>
       </div>
       <div id="card-info"></div>
+      <div class="practice-buttons">
+        <button id="missed-btn" title="Mark missed (see again soon)">Missed</button>
+        <button id="got-it-btn" title="Mark correct (see again later)">I know this</button>
+      </div>
       <div class="nav-buttons">
         <button id="prev-btn">Previous</button>
         <button id="home-btn">Home</button>
@@ -490,6 +519,8 @@
       const homeBtn = document.getElementById('home-btn');
       const themeToggleBtn = document.getElementById('theme-toggle-btn');
       const clearAllBtn = document.getElementById('clear-all-btn');
+      const gotItBtn = document.getElementById('got-it-btn');
+      const missedBtn = document.getElementById('missed-btn');
 
       // --- Self-tests (helps catch missing IDs early) ---
       function runSelfTests() {
@@ -512,6 +543,8 @@
           homeBtn,
           themeToggleBtn,
           clearAllBtn,
+          gotItBtn,
+          missedBtn,
           tbody,
         };
         const missing = Object.entries(required)
@@ -533,7 +566,11 @@
       dateInput.valueAsDate = new Date();
 
       let cards = [];
-      let idx = 0;
+
+      // Spaced-repetition-lite queue for this session
+      // deck[0] is the current card
+      let deck = [];
+      let history = [];
 
       // --- Dark mode (manual + saved) ---
       const THEME_KEY = 'qbStudyTheme';
@@ -630,9 +667,10 @@
 
       function showFlashcards() {
         shuffleArray(cards);
+        deck = cards.slice();
+        history = [];
         mainView.style.display = 'none';
         flashView.style.display = 'block';
-        idx = 0;
         updateCard(true);
       }
 
@@ -698,14 +736,17 @@
       }
 
       function updateCard(isFirst = false) {
-        if (!cards.length) return;
+        if (!deck.length) return;
 
         snapCardToFrontNoSpoiler();
 
-        const { answer, clue } = cards[idx];
+        const { answer, clue } = deck[0];
         frontDiv.textContent = clue;
         backDiv.textContent = answer;
-        infoDiv.textContent = `${idx + 1} / ${cards.length}`;
+
+        const total = history.length + deck.length;
+        const current = history.length + 1;
+        infoDiv.textContent = `${current} / ${total}`;
 
         requestAnimationFrame(() => {
           restoreCardTransition();
@@ -713,22 +754,56 @@
         });
       }
 
+      function advanceToNext() {
+        if (deck.length <= 1) {
+          updateCard();
+          return;
+        }
+        const current = deck.shift();
+        history.push(current);
+        updateCard();
+      }
+
+      function goToPrev() {
+        if (!history.length) return;
+        const prev = history.pop();
+        deck.unshift(prev);
+        updateCard();
+      }
+
+      // Buttons:
+      // - I know this: move current to end of deck (see again later)
+      // - Missed: reinsert current a few cards ahead (see again soon)
+      function markGotIt() {
+        if (!deck.length) return;
+        const current = deck.shift();
+        history.push(current);
+        deck.push(current);
+        updateCard();
+      }
+
+      function markMissed() {
+        if (!deck.length) return;
+        const current = deck.shift();
+        history.push(current);
+        const insertAt = Math.min(3, deck.length);
+        deck.splice(insertAt, 0, current);
+        updateCard();
+      }
+
       flashcard.addEventListener('click', () => {
         flashcard.classList.toggle('flipped');
       });
 
+      gotItBtn.addEventListener('click', markGotIt);
+      missedBtn.addEventListener('click', markMissed);
+
       nextBtn.addEventListener('click', () => {
-        if (idx < cards.length - 1) {
-          idx++;
-          updateCard();
-        }
+        advanceToNext();
       });
 
       prevBtn.addEventListener('click', () => {
-        if (idx > 0) {
-          idx--;
-          updateCard();
-        }
+        goToPrev();
       });
 
       homeBtn.addEventListener('click', () => {
@@ -739,6 +814,8 @@
 
         snapCardToFrontNoSpoiler();
         restoreCardTransition();
+        deck = [];
+        history = [];
       });
     })();
   </script>
